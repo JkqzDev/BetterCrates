@@ -12,11 +12,16 @@ use pocketmine\player\Player;
 final class BetterCratesCommand extends Command {
 
     public function __construct() {
-        parent::__construct('crates');
+        parent::__construct('crate', 'Command for crates');
+        $this->setPermission('crate.command');
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         if (!$sender instanceof Player) {
+            return;
+        }
+        
+        if (!$this->testPermission($sender)) {
             return;
         }
         $session = SessionFactory::get($sender);
