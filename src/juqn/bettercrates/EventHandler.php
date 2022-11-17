@@ -6,6 +6,7 @@ namespace juqn\bettercrates;
 
 use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\session\SessionFactory;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -16,6 +17,15 @@ use pocketmine\player\GameMode;
 use pocketmine\utils\TextFormat;
 
 final class EventHandler implements Listener {
+
+    public function handleBreak(BlockBreakEvent $event): void {
+        $block = $event->getBlock();
+        $crateBlock = BlockFactory::get($block->getPosition());
+
+        if ($crateBlock !== null) {
+            $event->cancel();
+        }
+    }
 
     public function handlePlace(BlockPlaceEvent $event): void {
         $block = $event->getBlock();
