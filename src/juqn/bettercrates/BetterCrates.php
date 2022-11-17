@@ -7,6 +7,7 @@ namespace juqn\bettercrates;
 use DayKoala\Windowy;
 use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\command\BetterCratesCommand;
+use juqn\bettercrates\command\BetterKeyCommand;
 use juqn\bettercrates\crate\CrateFactory;
 use juqn\bettercrates\entity\TextEntity;
 use pocketmine\entity\EntityDataHelper;
@@ -48,7 +49,8 @@ final class BetterCrates extends PluginBase {
 
     private function registerCommands(): void {
         $this->getServer()->getCommandMap()->registerAll('BetterCrates', [
-            new BetterCratesCommand
+            new BetterCratesCommand,
+            new BetterKeyCommand
         ]);
     }
 

@@ -140,6 +140,24 @@ final class Crate {
         });
         WindowWait::addWait($player, $window);
     }
+
+    public function editCrate(Player $player): void {
+        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize('&cCrate Edit'));
+        
+        if ($window === null) {
+            return;
+        }
+        assert($window instanceof CustomWindow);
+        $window->setContents($this->getItems());
+        $window->setCloseCallback(function (WindowAction $action): void {
+            $player = $action->getPlayer();
+            $inventory = $action->getInventory();
+
+            $this?->setItems($inventory->getContents());
+            $player->sendMessage(TextFormat::colorize('&aYou have been edited the crate successfully'));
+        });
+        WindowWait::addWait($player, $window);
+    }
     
     public function serializeData(): array {
         $data = [

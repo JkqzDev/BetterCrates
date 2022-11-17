@@ -11,6 +11,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\player\GameMode;
 use pocketmine\utils\TextFormat;
 
 final class EventHandler implements Listener {
@@ -53,6 +54,10 @@ final class EventHandler implements Listener {
         $event->cancel();
 
         if ($action === PlayerInteractEvent::LEFT_CLICK_BLOCK) {
+            if ($player->getServer()->isOp($player->getName()) && $player->getGamemode()->equals(GameMode::CREATIVE())) {
+                $crate->editCrate($player);
+                return;
+            }
             $crate->openCrate($player, $block->getPosition());
         } else {
             if ($item->getNamedTag()->getTag('crate_name') === null) {

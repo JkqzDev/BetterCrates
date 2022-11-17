@@ -13,8 +13,8 @@ use pocketmine\player\Player;
 final class BetterCratesCommand extends Command {
 
     public function __construct() {
-        parent::__construct('crate', 'Command for crates');
-        $this->setPermission('crate.command');
+        parent::__construct('crates', 'Command for crates');
+        $this->setPermission('crates.command');
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {

@@ -15,7 +15,7 @@ final class CrateRemoveForm extends CustomForm {
     public function __construct() {
         parent::__construct(TextFormat::colorize('&cRemove Crate'));
         $crates = array_keys(CrateFactory::getAll());
-        $cratesDropdown = new DropdownEntry('Crates', $crates);
+        $cratesDropdown = new DropdownEntry('Choose a crate', $crates);
 
         $this->addEntry($cratesDropdown, function (Player $player, DropdownEntry $entry, int $value) use ($crates): void {
             $crateName = $crates[$value];

@@ -38,7 +38,11 @@ final class CrateManageForm extends SimpleForm {
             $player->sendForm($form);
         });
         $this->addButton($edit, function (Player $player, int $button_index): void {
-
+            if (count(CrateFactory::getAll()) === 0) {
+                return;
+            }
+            $form = new CrateEditForm;
+            $player->sendForm($form);
         });
     }
 }

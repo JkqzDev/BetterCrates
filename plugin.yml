@@ -4,5 +4,7 @@ author: JuqnGOOD
 main: juqn\bettercrates\BetterCrates
 api: 4.0.0
 permissions:
-  crate.command:
+  crates.command:
+    default: op
+  key.command:
     default: op
