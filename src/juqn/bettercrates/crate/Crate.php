@@ -143,7 +143,7 @@ final class Crate {
     }
 
     public function editCrate(Player $player): void {
-        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat . '&r&7[E]'));
+        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat . ' &r&7(E)'));
         
         if ($window === null) {
             return;
