@@ -69,6 +69,7 @@ final class Crate {
         $unbreaking_enchantment = new EnchantmentInstance($unbreaking);
         
         $item = clone $this->keyItem;
+        $item->setCount($count);
         $item->setCustomName(TextFormat::colorize('&r' . $this->nameFormat));
         $item->addEnchantment($unbreaking_enchantment);
         $item->getNamedTag()->setString('crate_name', $this->name);
@@ -123,7 +124,7 @@ final class Crate {
             $pos->getWorld()->addSound($pos, new ChestOpenSound, [$player]);
         }
 
-        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize('&e' . $this->name));
+        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat));
         assert($window instanceof CustomWindow);
         $window->setContents($this->items);
 
@@ -142,7 +143,7 @@ final class Crate {
     }
 
     public function editCrate(Player $player): void {
-        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize('&cCrate Edit'));
+        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat . '&r&7[E]'));
         
         if ($window === null) {
             return;

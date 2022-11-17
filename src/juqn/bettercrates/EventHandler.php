@@ -79,7 +79,7 @@ final class EventHandler implements Listener {
             if ($item->getNamedTag()->getTag('crate_name') === null) {
                 return;
             }
-            $crateName = $item->getNamedTag()->getTag('crate_name');
+            $crateName = $item->getNamedTag()->getString('crate_name');
 
             if ($crateName !== $crate->getName()) {
                 return;
