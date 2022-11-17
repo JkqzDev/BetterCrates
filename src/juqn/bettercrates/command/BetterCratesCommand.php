@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace juqn\bettercrates\command;
 
+use juqn\bettercrates\form\CrateManageForm;
 use juqn\bettercrates\session\SessionFactory;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -29,5 +30,11 @@ final class BetterCratesCommand extends Command {
         if ($session === null) {
             return;
         }
+
+        if ($session->getPlaceCrateHandler() !== null) {
+            return;
+        }
+        $form = new CrateManageForm;
+        $sender->sendForm($form);
     }
 }

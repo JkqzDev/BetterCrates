@@ -11,6 +11,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\utils\TextFormat;
 
 final class EventHandler implements Listener {
 
@@ -30,6 +31,8 @@ final class EventHandler implements Listener {
         }
         $handler->place($block);
         $session->stopPlaceCrateHandler();
+
+        $player->sendMessage(TextFormat::colorize('&aYou have placed the crate successfully'));
     }
 
     public function handleInteract(PlayerInteractEvent $event): void {
@@ -52,13 +55,15 @@ final class EventHandler implements Listener {
         if ($action === PlayerInteractEvent::LEFT_CLICK_BLOCK) {
             $crate->openCrate($player, $block->getPosition());
         } else {
-            if ($item->getNamedTag()->getTag('crate_name') !== null) {
-                $crateName = $item->getNamedTag()->getString('crate_name');
-                
-                if ($crateName === $crate->getName()) {
-                    $crate->giveReward($player);
-                }
+            if ($item->getNamedTag()->getTag('crate_name') === null) {
+                return;
             }
+            $crateName = $item->getNamedTag()->getTag('crate_name');
+
+            if ($crateName !== $crate->getName()) {
+                return;
+            }
+            $crate->giveReward($player);
         }
     }
 

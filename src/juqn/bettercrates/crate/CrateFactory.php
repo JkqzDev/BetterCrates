@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace juqn\bettercrates\crate;
 
 use juqn\bettercrates\BetterCrates;
+use pocketmine\item\Item;
 use pocketmine\utils\Config;
 
 final class CrateFactory {
@@ -19,8 +20,9 @@ final class CrateFactory {
         return self::$crates[$name] ?? null;
     }
 
-    static public function create(string $name, string $nameFormat, string $textFormat, Item $keyItem, array $items, array $blocks): void {
-        self::$crates[$name] = new Crate($name, $nameFormat, $textFormat, $keyItem, $items, $blocks);
+    static public function create(string $name, string $nameFormat, string $textFormat, Item $keyItem, array $items = [], array $blocks = []): void {
+        self::$crates[$name] = $crate = new Crate($name, $nameFormat, $textFormat, $keyItem, $items, $blocks);
+        $crate->init();
     }
 
     static public function remove(string $name): void {
@@ -37,7 +39,6 @@ final class CrateFactory {
         foreach ($files as $file) {
             $name = basename($file, '.json');
             $config = new Config(BetterCrates::getInstance()->getDataFolder() . 'crates/' . $name . '.json', Config::JSON);
-            
             $data = Crate::deserializeData($config->getAll());
             
             self::create($name, $data['nameFormat'], $data['textFormat'], $data['keyItem'], $data['items'], $data['blocks']);

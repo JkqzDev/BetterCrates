@@ -26,6 +26,6 @@ final class Utils {
         if (!Server::getInstance()->getInstance()->getWorldManager()->isWorldLoaded($data[0])) {
             Server::getInstance()->getWorldManager()->loadWorld($data[0]);
         }
-        return new Position($data[1], $data[2], $data[3], Server::getInstance()->getWorldManager()->getWorldByName($data[0]));
+        return new Position((int) $data[1], (int) $data[2], (int) $data[3], Server::getInstance()->getWorldManager()->getWorldByName($data[0]));
     }
 }

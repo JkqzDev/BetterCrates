@@ -16,6 +16,7 @@ use pocketmine\block\tile\Chest;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
@@ -32,12 +33,14 @@ final class Crate {
         private Item $keyItem,
         private array $items,
         private array $blocks
-    ) {
+    ) {}
+    
+    public function init(): void {
         foreach ($this->blocks as $position => $data) {
             try {
                 $pos = Utils::deserializePosition($position);
-                BlockFactory::create($pos, (int) $data['id'], (int) $data['meta'], $name);
-            } catch (RuntimeException $exception) {}
+                BlockFactory::create($pos, (int) $data['id'], (int) $data['meta'], $this->name);
+            } catch (RuntimeException) {}
         }
     }
 
@@ -50,7 +53,7 @@ final class Crate {
     }
 
     public function getTextFormat(): string {
-        return $this->format;
+        return $this->textFormat;
     }
     
     public function getKeyItem(): Item {
@@ -106,6 +109,10 @@ final class Crate {
     
     public function setKeyItem(Item $value): void {
         $this->keyItem = $value;
+    }
+
+    public function setItems(array $items): void {
+        $this->items = $items;
     }
 
     public function openCrate(Player $player, Position $pos): void {
