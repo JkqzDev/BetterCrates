@@ -6,6 +6,8 @@ namespace juqn\bettercrates\form;
 
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\DropdownEntry;
+use juqn\bettercrates\block\Block;
+use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\crate\CrateFactory;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -23,6 +25,12 @@ final class CrateRemoveForm extends CustomForm {
             if (CrateFactory::get($crateName) === null) {
                 $player->sendMessage(TextFormat::colorize('&cCrate not exists.'));
                 return;
+            }
+            foreach (BlockFactory::getAll() as $pos => $block) {
+                assert($block instanceof Block);
+                $block->getText()?->flagForDespawn();
+
+                BlockFactory::remove($pos);
             }
             CrateFactory::remove($crateName);
             $player->sendMessage(TextFormat::colorize('&cCrate has been removed'));
