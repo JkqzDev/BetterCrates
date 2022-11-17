@@ -1,0 +1,5 @@
+name: BetterCrates
+version: 1.0
+author: JuqnGOOD
+main: juqn\bettercrates\BetterCrates
+api: 4.0.0
