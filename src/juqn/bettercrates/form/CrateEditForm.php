@@ -7,6 +7,8 @@ namespace juqn\bettercrates\form;
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\DropdownEntry;
 use cosmicpe\form\entries\custom\InputEntry;
+use juqn\bettercrates\block\Block;
+use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\crate\CrateFactory;
 use pocketmine\item\ItemFactory;
 use pocketmine\player\Player;
@@ -78,10 +80,19 @@ final class CrateEditForm extends CustomForm {
                         $player->sendMessage(TextFormat::colorize('&cUse numbers for key item'));
                         return;
                     }
+                    $oldTextFormat = $crate->getTextFormat();
+
                     $item = ItemFactory::getInstance()->get((int) $v[0], isset($v[1]) ? (int) $v[1] : 0);
                     $crate->setKeyItem($item);
                     $crate->setTextFormat($this->textFormat);
                     $crate->setNameFormat($this->nameFormat);
+
+                    if ($oldTextFormat !== $this->textFormat) {
+                        foreach (BlockFactory::getAll() as $block) {
+                            assert($block instanceof Block);
+                            $block->getText()?->setNameTag(TextFormat::colorize($this->textFormat));
+                        }
+                    }
 
                     $player->sendMessage(TextFormat::colorize('&aYou have been edit the crate successfully'));
                 });
