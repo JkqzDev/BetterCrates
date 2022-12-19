@@ -11,7 +11,7 @@ use RuntimeException;
 final class Utils {
 
     static public function positionToString(Position $position): string {
-        [$world, $x, $y, $z] = [$position->getWorld()->getFolderName(), $position->getFloorX(), $position->getFloorY(), $position->getFloorZ()];
+        [$world, $x, $y, $z] = [$position->getWorld()->getFolderName(), $position->getX(), $position->getY(), $position->getZ()];
         return $world . ':' . $x . ':' . $y . ':' . $z;
     }
 
@@ -25,6 +25,6 @@ final class Utils {
         if (!Server::getInstance()->getInstance()->getWorldManager()->isWorldLoaded($data[0])) {
             Server::getInstance()->getWorldManager()->loadWorld($data[0]);
         }
-        return new Position((int) $data[1], (int) $data[2], (int) $data[3], Server::getInstance()->getWorldManager()->getWorldByName($data[0]));
+        return new Position((float) $data[1], (float) $data[2], (float) $data[3], Server::getInstance()->getWorldManager()->getWorldByName($data[0]));
     }
 }

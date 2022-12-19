@@ -34,7 +34,7 @@ final class BetterKeyCommand extends Command {
                     '&r&f/key give - &cUse this command to give keys',
                     '&r&f/key giveall - &cUse this command to give all key.',
                 ];
-                $sender->sendMessage(implode(PHP_EOL, $messages));
+                $sender->sendMessage(TextFormat::colorize(implode(PHP_EOL, $messages)));
                 break;
 
             case 'give':

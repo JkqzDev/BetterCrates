@@ -24,7 +24,7 @@ final class Block {
         $crate = $this->getCrate();
 
         if ($crate !== null) {
-            $this->text = new TextEntity(Location::fromObject($position->add(0.5, 1.3, 0,5), $position->getWorld()));
+            $this->text = new TextEntity(Location::fromObject($position->add(0.5, 1.3, 0.5), $position->getWorld()));
             $this->text->setNameTag(TextFormat::colorize($crate->getTextFormat()));
             $this->text->spawnToAll();
         }
