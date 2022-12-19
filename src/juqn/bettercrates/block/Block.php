@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace juqn\bettercrates\block;
 
+use JetBrains\PhpStorm\ArrayShape;
 use juqn\bettercrates\crate\Crate;
 use juqn\bettercrates\crate\CrateFactory;
 use juqn\bettercrates\entity\TextEntity;
@@ -14,7 +15,7 @@ use pocketmine\world\Position;
 final class Block {
 
     public function __construct(
-        private Position $position,
+        Position $position,
         private string $crateName,
         private int $id,
         private int $meta,
@@ -37,7 +38,7 @@ final class Block {
         return $this->text;
     }
     
-    public function serializeData(): array {
+    #[ArrayShape(['id' => "int", 'meta' => "int"])] public function serializeData(): array {
         return [
             'id' => $this->id,
             'meta' => $this->meta

@@ -37,7 +37,7 @@ final class CrateEditForm extends CustomForm {
         return new class($crateName) extends CustomForm {
 
             public function __construct(
-                private $crateName,
+                string $crateName,
                 private ?string $nameFormat = null,
                 private ?string $textFormat = null
             ) {
@@ -56,7 +56,7 @@ final class CrateEditForm extends CustomForm {
                 });
                 $this->addEntry($item, function (Player $player, InputEntry $entry, string $value) use ($crateName): void {
                     $crate = CrateFactory::get($crateName);
-                    
+
                     if ($crate === null) {
                         $player->sendMessage(TextFormat::colorize('&cCrate not exists!'));
                         return;
@@ -65,17 +65,17 @@ final class CrateEditForm extends CustomForm {
                     if ($this->nameFormat === null) {
                         return;
                     }
-        
+
                     if ($this->textFormat === null) {
                         return;
                     }
                     $v = explode(':', $value);
-        
+
                     if (!is_numeric($v[0])) {
                         $player->sendMessage(TextFormat::colorize('&cUse numbers for key item'));
                         return;
                     }
-        
+
                     if (isset($v[1]) && !is_numeric($v[1])) {
                         $player->sendMessage(TextFormat::colorize('&cUse numbers for key item'));
                         return;
@@ -93,7 +93,6 @@ final class CrateEditForm extends CustomForm {
                             $block->getText()?->setNameTag(TextFormat::colorize($this->textFormat));
                         }
                     }
-
                     $player->sendMessage(TextFormat::colorize('&aYou have been edit the crate successfully'));
                 });
             }

@@ -6,12 +6,10 @@ namespace juqn\bettercrates\form;
 
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\InputEntry;
-use DayKoala\inventory\action\WindowAction;
-use DayKoala\inventory\tile\CustomWindow;
-use DayKoala\inventory\WindowFactory;
-use DayKoala\inventory\WindowIds;
-use DayKoala\scheduler\WindowWait;
 use juqn\bettercrates\crate\CrateFactory;
+use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\type\InvMenuTypeIds;
+use pocketmine\inventory\Inventory;
 use pocketmine\item\ItemFactory;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
@@ -74,19 +72,15 @@ final class CrateCreateForm extends CustomForm {
 
     private function createMenuForItems(Player $player, string $crateName): void {
         $crate = CrateFactory::get($crateName);
-        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize('&cCrate Edit'));
-        
-        if ($window === null) {
+
+        if ($crate === null) {
             return;
         }
-        assert($window instanceof CustomWindow);
-        $window->setCloseCallback(function (WindowAction $action) use ($crate): void {
-            $player = $action->getPlayer();
-            $inventory = $action->getInventory();
-
-            $crate?->setItems($inventory->getContents());
-            $player->sendMessage(TextFormat::colorize('&aYou have been create the crate successfully'));
+        $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
+        $menu->setInventoryCloseListener(function (Player $player, Inventory $inventory) use ($crate): void {
+            $crate->setItems($inventory->getContents());
+            $player->sendMessage(TextFormat::colorize('&aYou have been create the crate successfully.'));
         });
-        WindowWait::addWait($player, $window);
+        $menu->send($player, TextFormat::colorize('&cCreate Content'));
     }
 }

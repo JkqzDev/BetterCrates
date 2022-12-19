@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace juqn\bettercrates;
 
-use DayKoala\Windowy;
-use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\command\BetterCratesCommand;
 use juqn\bettercrates\command\BetterKeyCommand;
 use juqn\bettercrates\crate\CrateFactory;
 use juqn\bettercrates\entity\TextEntity;
+use muqsit\invmenu\InvMenuHandler;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
 use pocketmine\nbt\tag\CompoundTag;
@@ -29,7 +28,7 @@ final class BetterCrates extends PluginBase {
     }
 
     protected function onEnable(): void {
-        $this->registerWindowy();
+        $this->registerInvMenu();
         $this->registerCommands();
         $this->registerHandlers();
         $this->registerEntities();
@@ -41,7 +40,10 @@ final class BetterCrates extends PluginBase {
         CrateFactory::saveAll();
     }
 
-    private function registerWindowy(): void {
+    private function registerInvMenu(): void {
+        if (!InvMenuHandler::isRegistered()) {
+            InvMenuHandler::register($this);
+        }
     }
 
     private function registerCommands(): void {

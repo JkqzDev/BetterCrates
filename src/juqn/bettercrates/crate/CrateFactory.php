@@ -10,6 +10,7 @@ use pocketmine\utils\Config;
 
 final class CrateFactory {
 
+    /** @var Crate[] */
     static private array $crates = [];
     
     static public function getAll(): array {

@@ -17,16 +17,16 @@ final class BlockFactory {
     }
 
     static public function get(Position|string $position): ?CrateBlock {
-        $pos = $position instanceof Position ? Utils::serializePosition($position) : $position;
+        $pos = $position instanceof Position ? Utils::positionToString($position) : $position;
         return self::$blocks[$pos] ?? null;
     }
 
     static public function create(Position $position, int $id, int $meta, string $createName): void {
-        self::$blocks[Utils::serializePosition($position)] = new CrateBlock($position, $createName, $id, $meta);
+        self::$blocks[Utils::positionToString($position)] = new CrateBlock($position, $createName, $id, $meta);
     }
 
     static public function remove(Position|string $position): void {
-        $pos = $position instanceof Position ? Utils::serializePosition($position) : $position;
+        $pos = $position instanceof Position ? Utils::positionToString($position) : $position;
 
         if (self::get($pos) === null) {
             return;

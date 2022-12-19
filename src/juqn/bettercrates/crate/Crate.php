@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace juqn\bettercrates\crate;
 
-use DayKoala\inventory\action\WindowAction;
-use DayKoala\inventory\action\WindowTransaction;
-use DayKoala\inventory\tile\CustomWindow;
-use DayKoala\inventory\WindowFactory;
-use DayKoala\inventory\WindowIds;
-use DayKoala\scheduler\WindowWait;
+use JetBrains\PhpStorm\ArrayShape;
+use juqn\bettercrates\BetterCrates;
 use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\util\Utils;
+use muqsit\invmenu\InvMenu;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
+use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\block\tile\Chest;
+use pocketmine\inventory\Inventory;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\Item;
@@ -38,9 +39,11 @@ final class Crate {
     public function init(): void {
         foreach ($this->blocks as $position => $data) {
             try {
-                $pos = Utils::deserializePosition($position);
+                $pos = Utils::stringToPosition($position);
                 BlockFactory::create($pos, (int) $data['id'], (int) $data['meta'], $this->name);
-            } catch (RuntimeException) {}
+            } catch (RuntimeException $exception) {
+                BetterCrates::getInstance()->getLogger()->warning($exception->getMessage());
+            }
         }
     }
 
@@ -58,10 +61,6 @@ final class Crate {
     
     public function getKeyItem(): Item {
         return $this->keyItem;
-    }
-
-    public function getItems(): array {
-        return $this->items;
     }
 
     public function giveKey(Player $player, int $count = 1): bool {
@@ -117,50 +116,40 @@ final class Crate {
     }
 
     public function openCrate(Player $player, Position $pos): void {
-        /*$tile = $pos->getWorld()->getTile($pos);
+        $tile = $pos->getWorld()->getTile($pos);
 
         if ($tile instanceof Chest) {
             $tile->getInventory()->animateBlock(true);
             $pos->getWorld()->addSound($pos, new ChestOpenSound, [$player]);
         }
+        $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
+        $menu->getInventory()->setContents($this->items);
 
-        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat));
-        assert($window instanceof CustomWindow);
-        $window->setContents($this->items);
-
-        $window->setTransaction(function (WindowTransaction $transaction): void {
-            $transaction->cancel();
+        $menu->setListener(function (InvMenuTransaction $transaction): InvMenuTransactionResult {
+            return $transaction->discard();
         });
-        $window->setCloseCallback(function (WindowAction $action) use ($player, $pos): void {
-            $tile = $pos->getWorld()->getTile($pos);
-
+        $menu->setInventoryCloseListener(function (Player $player, Inventory $inventory) use ($tile, $pos): void {
             if ($tile instanceof Chest) {
                 $tile->getInventory()->animateBlock(false);
                 $pos->getWorld()->addSound($pos, new ChestCloseSound, [$player]);
             }
         });
-        WindowWait::addWait($player, $window);*/
+
+        $menu->send($player, TextFormat::colorize($this->nameFormat));
     }
 
     public function editCrate(Player $player): void {
-        /*$window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat . ' &r&7(E)'));
-        
-        if ($window === null) {
-            return;
-        }
-        assert($window instanceof CustomWindow);
-        $window->setContents($this->getItems());
-        $window->setCloseCallback(function (WindowAction $action): void {
-            $player = $action->getPlayer();
-            $inventory = $action->getInventory();
+        $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
+        $menu->getInventory()->setContents($this->items);
 
-            $this?->setItems($inventory->getContents());
-            $player->sendMessage(TextFormat::colorize('&aYou have been edited the crate successfully'));
+        $menu->setInventoryCloseListener(function (Player $player, Inventory $inventory): void {
+            $this->setItems($inventory->getContents());
+            $player->sendMessage(TextFormat::colorize('&cYou have been edited the create content successfully.'));
         });
-        WindowWait::addWait($player, $window);*/
+        $menu->send($player, TextFormat::colorize($this->nameFormat . ' &r&7(E)'));
     }
     
-    public function serializeData(): array {
+    #[ArrayShape(['nameFormat' => "string", 'textFormat' => "string", 'keyItem' => "string", 'items' => "array", 'blocks' => "array"])] public function serializeData(): array {
         $data = [
             'nameFormat' => $this->nameFormat,
             'textFormat' => $this->textFormat,
