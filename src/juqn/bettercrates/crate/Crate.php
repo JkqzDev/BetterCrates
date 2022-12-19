@@ -18,6 +18,7 @@ use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
@@ -122,9 +123,16 @@ final class Crate {
             $tile->getInventory()->animateBlock(true);
             $pos->getWorld()->addSound($pos, new ChestOpenSound, [$player]);
         }
+        $items = $this->items;
         $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
-        $menu->getInventory()->setContents($this->items);
 
+        for ($i = 0; $i < 27; $i++) {
+            if (isset($items[$i])) {
+                $menu->getInventory()->setItem($i, $items[$i]);
+            } else {
+                $menu->getInventory()->setItem($i, ItemFactory::getInstance()->get(ItemIds::GLASS_PANE, mt_rand(0, 10)));
+            }
+        }
         $menu->setListener(function (InvMenuTransaction $transaction): InvMenuTransactionResult {
             return $transaction->discard();
         });
@@ -134,7 +142,6 @@ final class Crate {
                 $pos->getWorld()->addSound($pos, new ChestCloseSound, [$player]);
             }
         });
-
         $menu->send($player, TextFormat::colorize($this->nameFormat));
     }
 
