@@ -10,6 +10,7 @@ use pocketmine\world\Position;
 
 final class BlockFactory {
 
+    /** @var Block[] */
     static private array $blocks = [];
     
     static public function getAll(): array {

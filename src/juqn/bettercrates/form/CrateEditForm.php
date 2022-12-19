@@ -7,7 +7,6 @@ namespace juqn\bettercrates\form;
 use cosmicpe\form\CustomForm;
 use cosmicpe\form\entries\custom\DropdownEntry;
 use cosmicpe\form\entries\custom\InputEntry;
-use juqn\bettercrates\block\Block;
 use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\crate\CrateFactory;
 use pocketmine\item\ItemFactory;
@@ -89,7 +88,6 @@ final class CrateEditForm extends CustomForm {
 
                     if ($oldTextFormat !== $this->textFormat) {
                         foreach (BlockFactory::getAll() as $block) {
-                            assert($block instanceof Block);
                             $block->getText()?->setNameTag(TextFormat::colorize($this->textFormat));
                         }
                     }
