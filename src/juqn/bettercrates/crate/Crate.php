@@ -117,7 +117,7 @@ final class Crate {
     }
 
     public function openCrate(Player $player, Position $pos): void {
-        $tile = $pos->getWorld()->getTile($pos);
+        /*$tile = $pos->getWorld()->getTile($pos);
 
         if ($tile instanceof Chest) {
             $tile->getInventory()->animateBlock(true);
@@ -139,11 +139,11 @@ final class Crate {
                 $pos->getWorld()->addSound($pos, new ChestCloseSound, [$player]);
             }
         });
-        WindowWait::addWait($player, $window);
+        WindowWait::addWait($player, $window);*/
     }
 
     public function editCrate(Player $player): void {
-        $window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat . ' &r&7(E)'));
+        /*$window = WindowFactory::getInstance()->get(WindowIds::DOUBLE_CHEST, TextFormat::colorize($this->nameFormat . ' &r&7(E)'));
         
         if ($window === null) {
             return;
@@ -157,7 +157,7 @@ final class Crate {
             $this?->setItems($inventory->getContents());
             $player->sendMessage(TextFormat::colorize('&aYou have been edited the crate successfully'));
         });
-        WindowWait::addWait($player, $window);
+        WindowWait::addWait($player, $window);*/
     }
     
     public function serializeData(): array {

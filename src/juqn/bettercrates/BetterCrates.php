@@ -42,9 +42,6 @@ final class BetterCrates extends PluginBase {
     }
 
     private function registerWindowy(): void {
-        if (!Windowy::isRegistered()) {
-            Windowy::register($this);
-        }
     }
 
     private function registerCommands(): void {
