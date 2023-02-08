@@ -89,7 +89,7 @@ final class Crate {
         }
         $item = $items[array_rand($items)];
 
-        if (!$player->getInventory()->canAddItem($item)) {
+        if (count($player->getInventory()->getContents()) >= $player->getInventory()->getSize()) {
             return false;
         }
         $itemHand = clone $player->getInventory()->getItemInHand();
@@ -170,6 +170,9 @@ final class Crate {
         }
         
         foreach (BlockFactory::getAll() as $pos => $block) {
+            if ($block->getCrateName() !== $this->name) {
+                continue;
+            }
             $data['blocks'][$pos] = $block->serializeData();
         }
         return $data;

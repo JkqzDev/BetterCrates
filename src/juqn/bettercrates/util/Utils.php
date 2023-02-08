@@ -11,7 +11,7 @@ use RuntimeException;
 final class Utils {
 
     static public function positionToString(Position $position): string {
-        [$world, $x, $y, $z] = [$position->getWorld()->getFolderName(), $position->getX(), $position->getY(), $position->getZ()];
+        [$world, $x, $y, $z] = [$position->getWorld()->getFolderName(), $position->getFloorX(), $position->getFloorY(), $position->getFloorZ()];
         return $world . ':' . $x . ':' . $y . ':' . $z;
     }
 

@@ -30,6 +30,10 @@ final class Block {
         }
     }
 
+    public function getCrateName(): string {
+        return $this->crateName;
+    }
+
     public function getCrate(): ?Crate {
         return CrateFactory::get($this->crateName);
     }
