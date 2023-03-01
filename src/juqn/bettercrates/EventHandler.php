@@ -72,6 +72,7 @@ final class EventHandler implements Listener {
             $crate->openCrate($player, $block->getPosition());
         } else {
             if ($player->getServer()->isOp($player->getName()) && $player->getGamemode()->equals(GameMode::CREATIVE()) && $player->getInventory()->getItemInHand()->equals(VanillaItems::STICK())) {
+                $crateBlock->getText()?->flagForDespawn();
                 BlockFactory::remove($block->getPosition());
                 $player->sendMessage(TextFormat::colorize('&cCrate has been removed'));
                 return;

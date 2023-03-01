@@ -27,10 +27,10 @@ final class CrateRemoveForm extends CustomForm {
                 return;
             }
             foreach (BlockFactory::getAll() as $pos => $block) {
-                assert($block instanceof Block);
-                $block->getText()?->flagForDespawn();
-
-                BlockFactory::remove($pos);
+                if ($block->getCrateName() === $crateName) {
+                    $block->getText()?->flagForDespawn();
+                    BlockFactory::remove($pos);
+                }
             }
             CrateFactory::remove($crateName);
             $player->sendMessage(TextFormat::colorize('&cCrate has been removed'));

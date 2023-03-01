@@ -24,8 +24,9 @@ final class Block {
         $crate = $this->getCrate();
 
         if ($crate !== null) {
-            $this->text = new TextEntity(Location::fromObject($position->add(0.5, 1.3, 0.5), $position->getWorld()));
+            $this->text = new TextEntity(Location::fromObject($position->add(0.5, 1.3, 0.5), $position->getWorld()), null, $this->crateName);
             $this->text->setNameTag(TextFormat::colorize($crate->getTextFormat()));
+            $this->text->setCanSaveWithChunk(true);
             $this->text->spawnToAll();
         }
     }
@@ -40,6 +41,10 @@ final class Block {
 
     public function getText(): ?TextEntity {
         return $this->text;
+    }
+
+    public function setText(?TextEntity $text): void {
+        $this->text = $text;
     }
     
     #[ArrayShape(['id' => "int", 'meta' => "int"])] public function serializeData(): array {
