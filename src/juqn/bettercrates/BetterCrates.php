@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace juqn\bettercrates;
 
+use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\command\BetterCratesCommand;
 use juqn\bettercrates\command\BetterKeyCommand;
 use juqn\bettercrates\crate\CrateFactory;
@@ -13,15 +14,11 @@ use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
 
 final class BetterCrates extends PluginBase {
-
-    static private BetterCrates $instance;
-
-    static public function getInstance(): BetterCrates {
-        return self::$instance;
-    }
+	use SingletonTrait;
 
     protected function onLoad(): void {
         self::$instance = $this;
@@ -34,10 +31,12 @@ final class BetterCrates extends PluginBase {
         $this->registerEntities();
 
         CrateFactory::loadAll();
-    }
+		BlockFactory::loadAll();
+	}
 
     protected function onDisable(): void {
         CrateFactory::saveAll();
+		BlockFactory::saveAll();
     }
 
     private function registerInvMenu(): void {

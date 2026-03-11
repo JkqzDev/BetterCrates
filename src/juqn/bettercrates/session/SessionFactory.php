@@ -19,9 +19,7 @@ final class SessionFactory {
     }
 
     static public function remove(Player $player): void {
-        if (self::get($player) === null) {
-            return;
-        }
+        if (self::get($player) === null) return;
         unset(self::$sessions[$player->getXuid()]);
     }
 }

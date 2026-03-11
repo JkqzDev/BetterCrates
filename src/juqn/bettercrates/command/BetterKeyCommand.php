@@ -18,9 +18,7 @@ final class BetterKeyCommand extends Command {
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
-        if (!$this->testPermission($sender)) {
-            return;
-        }
+        if (!$this->testPermission($sender)) return;
 
         if (!isset($args[0])) {
             $sender->sendMessage(TextFormat::colorize('&cUse /key help'));

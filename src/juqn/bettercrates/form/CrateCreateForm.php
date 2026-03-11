@@ -3,20 +3,78 @@
 declare(strict_types=1);
 
 namespace juqn\bettercrates\form;
-
-use cosmicpe\form\CustomForm;
-use cosmicpe\form\entries\custom\InputEntry;
+use dktapps\pmforms\CustomForm;
+use dktapps\pmforms\CustomFormResponse;
+use dktapps\pmforms\element\Input;
 use juqn\bettercrates\crate\CrateFactory;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\inventory\Inventory;
-use pocketmine\item\ItemFactory;
+use pocketmine\item\LegacyStringToItemParser;
+use pocketmine\item\StringToItemParser;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-final class CrateCreateForm extends CustomForm {
+final class CrateCreateForm {
 
-    public function __construct(
+	public static function create(Player $player) : void {
+		$form = new CustomForm(
+			TextFormat::colorize('&rCreate a new crate'),
+			[
+				new Input('name', 'Name', 'Example: legend'),
+				new Input('customName', 'Custom Item Name', 'Example: &6Legend'),
+				new Input('textFormat', 'Custom Floating Text', 'Example: &6Legend\n&7Right click to open!'),
+				new Input('itemKey', 'Item Key', 'Example: 322:0')
+			],
+			function (Player $player, CustomFormResponse $response) : void {
+				$name = $response->getString('name');
+				$customName = $response->getString('customName');
+				$textFormat = $response->getString('textFormat');
+				$itemKey = $response->getString('itemKey');
+
+				if (CrateFactory::get($name) !== null) {
+					$player->sendMessage(TextFormat::colorize('&cCrate already exists.'));
+					return;
+				}
+
+				if (trim($customName) === '') {
+					$player->sendMessage(TextFormat::colorize('&cInvalid custom item name'));
+					return;
+				}
+
+				if (trim($textFormat) === '') {
+					$player->sendMessage(TextFormat::colorize('&cInvalid custom floating text'));
+					return;
+				}
+				$item = StringToItemParser::getInstance()->parse($itemKey) ?? LegacyStringToItemParser::getInstance()->parse($itemKey) ?? null;
+
+				if ($item === null) {
+					$player->sendMessage(TextFormat::colorize('&cInvalid key item.'));
+					return;
+				}
+				CrateFactory::create($name, $customName, $textFormat, $item, []);
+
+				self::createMenuForItems($player, $name);
+				//CrateFactory::create($this->name, $this->nameFormat, $this->textFormat, $item);
+			}
+		);
+
+		$player->sendForm($form);
+	}
+
+	private static function createMenuForItems(Player $player, string $crateName): void {
+		$crate = CrateFactory::get($crateName);
+
+		if ($crate === null) return;
+		$menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
+		$menu->setInventoryCloseListener(function (Player $player, Inventory $inventory) use ($crate): void {
+			$crate->setItems($inventory->getContents());
+			$player->sendMessage(TextFormat::colorize('&aYou have been create the crate successfully.'));
+		});
+		$menu->send($player, TextFormat::colorize('&cCreate Content'));
+	}
+
+    /*public function __construct(
         private ?string $name = null,
         private ?string $nameFormat = null,
         private ?string $textFormat = null
@@ -82,5 +140,5 @@ final class CrateCreateForm extends CustomForm {
             $player->sendMessage(TextFormat::colorize('&aYou have been create the crate successfully.'));
         });
         $menu->send($player, TextFormat::colorize('&cCreate Content'));
-    }
+    }*/
 }
