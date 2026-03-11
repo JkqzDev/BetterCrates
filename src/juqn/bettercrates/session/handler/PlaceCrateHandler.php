@@ -15,7 +15,9 @@ final class PlaceCrateHandler {
     ) {}
 
     public function place(Block $block): void {
-        $crate = CrateFactory::get($this->crateName);
-        BlockFactory::create($block->getPosition(), $block->getId(), $block->getMeta(), $crate->getName());
+        //$crate = CrateFactory::get($this->crateName);
+
+		BlockFactory::create($block->getPosition(), $block, $this->crateName);
+        //BlockFactory::create($block->getPosition(), $block->getId(), $block->getMeta(), $crate->getName());
     }
 }

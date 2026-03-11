@@ -8,17 +8,19 @@ use JetBrains\PhpStorm\ArrayShape;
 use juqn\bettercrates\BetterCrates;
 use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\util\Utils;
+use kim\present\utils\itemserialize\ItemSerializerTrait;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\InvMenuTypeIds;
 use pocketmine\block\tile\Chest;
+use pocketmine\block\utils\DyeColor;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\enchantment\EnchantmentInstance;
 use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\Item;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\Position;
@@ -27,26 +29,15 @@ use pocketmine\world\sound\ChestOpenSound;
 use RuntimeException;
 
 final class Crate {
+	use ItemSerializerTrait;
 
     public function __construct(
         private string $name,
         private string $nameFormat,
         private string $textFormat,
         private Item $keyItem,
-        private array $items,
-        private array $blocks
+        private array $items
     ) {}
-    
-    public function init(): void {
-        foreach ($this->blocks as $position => $data) {
-            try {
-                $pos = Utils::stringToPosition($position);
-                BlockFactory::create($pos, (int) $data['id'], (int) $data['meta'], $this->name);
-            } catch (RuntimeException $exception) {
-                BetterCrates::getInstance()->getLogger()->warning($exception->getMessage());
-            }
-        }
-    }
 
     public function getName(): string {
         return $this->name;
@@ -65,18 +56,24 @@ final class Crate {
     }
 
     public function giveKey(Player $player, int $count = 1): bool {
-        $unbreaking = VanillaEnchantments::UNBREAKING();
-        $unbreaking_enchantment = new EnchantmentInstance($unbreaking);
+        //$unbreaking = VanillaEnchantments::UNBREAKING();
+        //$unbreaking_enchantment = new EnchantmentInstance($unbreaking);
         
-        $item = clone $this->keyItem;
-        $item->setCount($count);
-        $item->setCustomName(TextFormat::colorize('&r' . $this->nameFormat));
-        $item->addEnchantment($unbreaking_enchantment);
-        $item->getNamedTag()->setString('crate_name', $this->name);
-        
-        if (!$player->getInventory()->canAddItem($item)) {
-            return false;
-        }
+        //$item = clone $this->keyItem;
+        //$item->setCount($count);
+        //$item->setCustomName(TextFormat::colorize('&r' . $this->nameFormat));
+        //$item->addEnchantment($unbreaking_enchantment);
+        //$item->getNamedTag()->setString('crate_name', $this->name);
+		$item = clone $this->keyItem
+			->setCount($count)
+			->setCustomName(TextFormat::colorize('&r' . $this->nameFormat))
+			->addEnchantment(new EnchantmentInstance(VanillaEnchantments::UNBREAKING()))
+			->setCustomBlockData(
+				CompoundTag::create()
+				->setString('crateName', $this->name)
+			);
+
+        if (!$player->getInventory()->canAddItem($item)) return false;
         $player->getInventory()->addItem($item);
         return true;
     }
@@ -84,14 +81,10 @@ final class Crate {
     public function giveReward(Player $player): bool {
         $items = $this->items;
 
-        if (count($items) === 0) {
-            return false;
-        }
+        if (count($items) === 0) return false;
         $item = $items[array_rand($items)];
 
-        if (count($player->getInventory()->getContents()) >= $player->getInventory()->getSize()) {
-            return false;
-        }
+        if (count($player->getInventory()->getContents()) >= $player->getInventory()->getSize()) return false; // prevent duplicate items
         $itemHand = clone $player->getInventory()->getItemInHand();
         $itemHand->pop();
         
@@ -126,13 +119,19 @@ final class Crate {
         $items = $this->items;
         $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
 
+		$colors = DyeColor::getAll();
+
         for ($i = 0; $i < 27; $i++) {
-            if (isset($items[$i])) {
-                $menu->getInventory()->setItem($i, $items[$i]);
-            } else {
-                $menu->getInventory()->setItem($i, ItemFactory::getInstance()->get(ItemIds::GLASS_PANE, mt_rand(0, 10)));
+			if (isset($items[$i])) {
+				$menu->getInventory()->setItem($i, $items[$i]);
+			} else {
+				$menu->getInventory()->setItem($i, VanillaBlocks::STAINED_GLASS_PANE()
+					->setColor($colors[array_rand($colors)])
+					->asItem()
+				);
+                //$menu->getInventory()->setItem($i, ItemFactory::getInstance()->get(ItemIds::GLASS_PANE, mt_rand(0, 10)));
             }
-        }
+		}
         $menu->setListener(function (InvMenuTransaction $transaction): InvMenuTransactionResult {
             return $transaction->discard();
         });
@@ -157,34 +156,29 @@ final class Crate {
     }
     
     #[ArrayShape(['nameFormat' => "string", 'textFormat' => "string", 'keyItem' => "string", 'items' => "array", 'blocks' => "array"])] public function serializeData(): array {
-        $data = [
+		/*foreach (BlockFactory::getAll() as $pos => $block) {
+			if ($block->getCrateName() !== $this->name) continue;
+			$data['blocks'][$pos] = $block->serializeData();
+		}*/
+
+        return [
             'nameFormat' => $this->nameFormat,
             'textFormat' => $this->textFormat,
-            'keyItem' => $this->keyItem->getId() . ':' . $this->keyItem->getMeta(),
-            'items' => [],
-            'blocks' => []
+			'keyItem' => self::serialize($this->keyItem),
+            //'keyItem' => $this->keyItem->getId() . ':' . $this->keyItem->getMeta(),
+            'items' => array_map(fn(Item $item) => self::serialize($item), $this->items),
         ];
-        
-        foreach ($this->items as $slot => $item) {
-            $data['items'][$slot] = $item->jsonSerialize();
-        }
-        
-        foreach (BlockFactory::getAll() as $pos => $block) {
-            if ($block->getCrateName() !== $this->name) {
-                continue;
-            }
-            $data['blocks'][$pos] = $block->serializeData();
-        }
-        return $data;
     }
     
     static public function deserializeData(array $data): array {
-        $itemData = explode(':', $data['keyItem']);
-        $data['keyItem'] = ItemFactory::getInstance()->get((int) $itemData[0], (int) $itemData[1]);
+        $data['keyItem'] = self::deserialize($data['keyItem']);
+		$data['items'] = array_map(fn(string $itemData) => self::deserialize($itemData), $data['items']);
+		//$itemData = explode(':', $data['keyItem']);
+        //$data['keyItem'] = ItemFactory::getInstance()->get((int) $itemData[0], (int) $itemData[1]);
         
-        foreach ($data['items'] as $slot => $item) {
-            $data['items'][$slot] = Item::jsonDeserialize($item);
-        }
+        /*foreach ($data['items'] as $slot => $item) {
+            //$data['items'][$slot] = Item::jsonDeserialize($item);
+        }*/
         return $data;
     }
 }

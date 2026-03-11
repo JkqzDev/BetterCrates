@@ -18,23 +18,16 @@ final class BetterCratesCommand extends Command {
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
-        if (!$sender instanceof Player) {
-            return;
-        }
+        if (!$sender instanceof Player) return;
         
-        if (!$this->testPermission($sender)) {
-            return;
-        }
+        if (!$this->testPermission($sender)) return;
         $session = SessionFactory::get($sender);
 
-        if ($session === null) {
-            return;
-        }
+        if ($session === null) return;
 
-        if ($session->getPlaceCrateHandler() !== null) {
-            return;
-        }
-        $form = new CrateManageForm;
-        $sender->sendForm($form);
+        if ($session->getPlaceCrateHandler() !== null) return;
+        CrateManageForm::create($sender);
+		//$form = new CrateManageForm;
+        //$sender->sendForm($form);
     }
 }

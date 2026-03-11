@@ -4,18 +4,101 @@ declare(strict_types=1);
 
 namespace juqn\bettercrates\form;
 
-use cosmicpe\form\CustomForm;
-use cosmicpe\form\entries\custom\DropdownEntry;
-use cosmicpe\form\entries\custom\InputEntry;
+use dktapps\pmforms\CustomForm;
+use dktapps\pmforms\CustomFormResponse;
+use dktapps\pmforms\element\Dropdown;
+use dktapps\pmforms\element\Input;
 use juqn\bettercrates\block\BlockFactory;
 use juqn\bettercrates\crate\CrateFactory;
-use pocketmine\item\ItemFactory;
+use pocketmine\item\LegacyStringToItemParser;
+use pocketmine\item\StringToItemParser;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 
-final class CrateEditForm extends CustomForm {
+final class CrateEditForm {
 
-    public function __construct() {
+	public static function create(Player $player) : void {
+		$names = array_keys(CrateFactory::getAll());
+
+		$form = new CustomForm(
+			TextFormat::colorize('&rEdit Crate'),
+			[
+				new Dropdown(
+					'crate',
+					'Choose an crate',
+					$names
+				)
+			],
+			function (Player $player, CustomFormResponse $response) use ($names) : void {
+				$key = $response->getInt('crate');
+				$crateName = $names[$key];
+
+				if (CrateFactory::get($crateName) === null) {
+					$player->sendMessage(TextFormat::colorize('&cCrate not exists.'));
+					return;
+				}
+				self::crateEdit($player, $crateName);
+			}
+		);
+
+		$player->sendForm($form);
+	}
+
+	private static function crateEdit(Player $player, string $crateName) : void {
+		$crate = CrateFactory::get($crateName);
+
+		if ($crate === null) return;
+		$form = new CustomForm(
+			TextFormat::colorize('&rEdit Crate'),
+			[
+				new Input('customName', 'Custom Item Name', 'Example: &6Legend', $crate->getNameFormat()),
+				new Input('textFormat', 'Custom Floating Text', 'Example: &6Legend\n&7Right click to open!', $crate->getTextFormat()),
+				new Input('itemKey', 'Item Key', 'Example: 322:0', StringToItemParser::getInstance()->lookupAliases($crate->getKeyItem()) ?? $crate->getKeyItem()->getVanillaName())
+			],
+			function (Player $player, CustomFormResponse $response) use ($crate) : void {
+				$customName = $response->getString('customName');
+				$textFormat = $response->getString('textFormat');
+				$itemKey = $response->getString('itemKey');
+
+				if (trim($customName) === '') {
+					$player->sendMessage(TextFormat::colorize('&cInvalid custom item name'));
+					return;
+				}
+
+				if (trim($textFormat) === '') {
+					$player->sendMessage(TextFormat::colorize('&cInvalid custom floating text'));
+					return;
+				}
+				$item = StringToItemParser::getInstance()->parse($itemKey) ?? LegacyStringToItemParser::getInstance()->parse($itemKey) ?? null;
+
+				if ($item === null) {
+					$player->sendMessage(TextFormat::colorize('&cInvalid key item.'));
+					return;
+				}
+				$oldTextFormat = $crate->getTextFormat();
+
+				if ($oldTextFormat !== $textFormat) {
+					foreach (BlockFactory::getAll() as $blocks) {
+						foreach ($blocks as $block) {
+							$c = $block->getCrate();
+
+							if ($c === null || $c->getName() !== $crate->getName()) continue;
+							$block->despawn(); // hack
+							$block->spawn(); // hack
+						}
+					}
+				}
+				$crate->setNameFormat($customName);
+				$crate->setTextFormat($textFormat);
+				$crate->setKeyItem($item);
+
+				$player->sendMessage(TextFormat::colorize('&aYou have been edit the crate successfully'));
+			}
+		);
+
+		$player->sendForm($form);
+	}
+    /*public function __construct() {
         parent::__construct(TextFormat::colorize('&cEdit Crate'));
         $crates = array_keys(CrateFactory::getAll());
         $cratesDropdown = new DropdownEntry('Choose a crate', $crates);
@@ -95,5 +178,5 @@ final class CrateEditForm extends CustomForm {
                 });
             }
         };
-    }
+    }*/
 }

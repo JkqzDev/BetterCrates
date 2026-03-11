@@ -1,5 +1,19 @@
 {
+  "scripts": {
+    "build-plugin": "@php -dphar.readonly=0 build-plugin.php"
+  },
+  "repositories": [
+    {
+      "url": "https://github.com/presentkim-pm/item-serialize-utils.git",
+      "type": "vcs"
+    }
+  ],
+  "require-dev": {
+    "pocketmine/pocketmine-mp": ">=5.41.0"
+  },
   "require": {
-    "pocketmine/pocketmine-mp": "4.12.2"
+    "muqsit/invmenu": "dev-pm5",
+    "dktapps/pmforms": "dev-master",
+    "presentkim/item-serialize-utils": "dev-main"
   }
 }

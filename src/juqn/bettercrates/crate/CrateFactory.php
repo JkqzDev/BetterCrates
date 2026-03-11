@@ -10,7 +10,7 @@ use pocketmine\utils\Config;
 
 final class CrateFactory {
 
-    /** @var Crate[] */
+    /** @var array<string, Crate> */
     static private array $crates = [];
     
     static public function getAll(): array {
@@ -21,15 +21,12 @@ final class CrateFactory {
         return self::$crates[$name] ?? null;
     }
 
-    static public function create(string $name, string $nameFormat, string $textFormat, Item $keyItem, array $items = [], array $blocks = []): void {
-        self::$crates[$name] = $crate = new Crate($name, $nameFormat, $textFormat, $keyItem, $items, $blocks);
-        $crate->init();
+    static public function create(string $name, string $nameFormat, string $textFormat, Item $keyItem, array $items): void {
+        self::$crates[$name] = new Crate($name, $nameFormat, $textFormat, $keyItem, $items);
     }
 
     static public function remove(string $name): void {
-        if (self::get($name) === null) {
-            return;
-        }
+        if (self::get($name) === null) return;
         unset(self::$crates[$name]);
     }
 
