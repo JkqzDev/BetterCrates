@@ -32,6 +32,8 @@ final class CrateManageForm {
 				};
 			}
 		);
+
+		$player->sendForm($form);
 	}
 
     /*public function __construct() {

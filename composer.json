@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build-plugin": "@php -dphar.readonly=0 build-plugin.php"
+  },
   "repositories": [
     {
       "url": "https://github.com/presentkim-pm/item-serialize-utils.git",
